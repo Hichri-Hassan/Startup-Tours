@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -51,7 +51,7 @@ const boardGames = [
   },
 ];
 
-const QuestionScreen = ({onReset, groupMembers}) => {
+const QuestionScreen = ({ onReset, groupMembers }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [showGroupChange, setShowGroupChange] = useState(false);
   const [activityType, setActivityType] = useState(
@@ -344,7 +344,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   nextButton: {
-    backgroundColor: '#e1a3ff',
+    backgroundColor: '#c12ec4',
     borderRadius: 25,
     paddingVertical: 16,
     paddingHorizontal: 24,
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
   },
   continueButton: {
     width: '100%',
-    backgroundColor: '#e1a3ff',
+    backgroundColor: '#c12ec4',
     borderRadius: 25,
     paddingVertical: 16,
     alignItems: 'center',

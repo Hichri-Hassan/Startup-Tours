@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {SafeAreaView, StyleSheet, View} from 'react-native';
 import {StatusBar} from 'expo-status-bar';
+import HomeScreen from './src/screens/HomeScreen';
 import ScanScreen from './src/screens/ScanScreen';
 import DataEntryScreen from './src/screens/DataEntryScreen';
 import WaitingScreen from './src/screens/WaitingScreen';
@@ -9,7 +10,7 @@ import QuestionScreen from './src/screens/QuestionScreen';
 import GuessWhoScreen from './src/screens/GuessWhoScreen';
 
 const App = () => {
-  const [currentScreen, setCurrentScreen] = useState('scan');
+  const [currentScreen, setCurrentScreen] = useState('home');
   const [userData, setUserData] = useState({
     name: '',
     mood: '',
@@ -18,6 +19,10 @@ const App = () => {
     lookingFor: '',
   });
   const [groupMembers, setGroupMembers] = useState([]);
+
+  const handleOpenScanner = () => {
+    setCurrentScreen('scan');
+  };
 
   const handleScanComplete = () => {
     setCurrentScreen('entry');
@@ -49,7 +54,7 @@ const App = () => {
   };
 
   const handleBackToScan = () => {
-    setCurrentScreen('scan');
+    setCurrentScreen('home');
     setUserData({name: '', mood: '', intention: '', age: '', lookingFor: ''});
   };
 
@@ -57,6 +62,9 @@ const App = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
       <View style={styles.content}>
+        {currentScreen === 'home' && (
+          <HomeScreen onScanPress={handleOpenScanner} />
+        )}
         {currentScreen === 'scan' && (
           <ScanScreen onScanComplete={handleScanComplete} />
         )}
