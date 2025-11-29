@@ -10,57 +10,7 @@ import {
 import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
-
-const bars = [
-    {
-        id: 1,
-        name: 'Le Central Bar',
-        address: 'Place Jean Jaurès, Tours',
-        distance: '120 m',
-        rating: 4.5,
-        image: '🍺',
-        hours: 'Ouvert jusqu\'à 02:00',
-        popular: true,
-        latitude: 47.3941,
-        longitude: 0.6848,
-    },
-    {
-        id: 2,
-        name: 'Café des Arts',
-        address: 'Rue Nationale, Tours',
-        distance: '250 m',
-        rating: 4.2,
-        image: '🎨',
-        hours: 'Ouvert jusqu\'à 00:00',
-        popular: false,
-        latitude: 47.3950,
-        longitude: 0.6860,
-    },
-    {
-        id: 3,
-        name: 'Le Temps des Cerises',
-        address: 'Place Plumereau, Tours',
-        distance: '380 m',
-        rating: 4.7,
-        image: '🍷',
-        hours: 'Ouvert jusqu\'à 01:00',
-        popular: true,
-        latitude: 47.3955,
-        longitude: 0.6820,
-    },
-    {
-        id: 4,
-        name: 'Pub Saint Patrick',
-        address: 'Rue Colbert, Tours',
-        distance: '450 m',
-        rating: 4.3,
-        image: '🍀',
-        hours: 'Ouvert jusqu\'à 02:00',
-        popular: false,
-        latitude: 47.3930,
-        longitude: 0.6835,
-    },
-];
+import bars from '../data/Bars';
 
 const HomeScreen = ({ onScanPress }) => {
     const [viewMode, setViewMode] = useState('liste');
@@ -156,7 +106,7 @@ const HomeScreen = ({ onScanPress }) => {
                             style={styles.barCard}
                             activeOpacity={0.8}>
                             {bar.popular && (
-                                <View style={styles.popularBadge}>
+                                <View sAjouttyle={styles.popularBadge}>
                                     <Text style={styles.popularText}>Populaire</Text>
                                 </View>
                             )}
