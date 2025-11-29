@@ -151,27 +151,27 @@ const HomeScreen = ({ onScanPress }) => {
                             latitudeDelta: 0.01,
                             longitudeDelta: 0.01,
                         }}>
-                    {bars.map(bar => (
-                        <Marker
-                            key={bar.id}
-                            coordinate={{
-                                latitude: bar.latitude,
-                                longitude: bar.longitude,
-                            }}
-                            title={bar.name}
-                            description={bar.address}>
-                            <View style={styles.markerContainer}>
-                                <View style={styles.markerBubble}>
-                                    <Text style={styles.markerEmoji}>{bar.image}</Text>
-                                </View>
-                                {bar.popular && (
-                                    <View style={styles.markerBadge}>
-                                        <Text style={styles.markerBadgeText}>⭐</Text>
+                        {bars.map(bar => (
+                            <Marker
+                                key={bar.id}
+                                coordinate={{
+                                    latitude: bar.latitude,
+                                    longitude: bar.longitude,
+                                }}
+                                title={bar.name}
+                                description={bar.address}>
+                                <View style={styles.markerContainer}>
+                                    <View style={styles.markerBubble}>
+                                        <Text style={styles.markerEmoji}>{bar.image}</Text>
                                     </View>
-                                )}
-                            </View>
-                        </Marker>
-                    ))}
+                                    {bar.popular && (
+                                        <View style={styles.markerBadge}>
+                                            <Text style={styles.markerBadgeText}>⭐</Text>
+                                        </View>
+                                    )}
+                                </View>
+                            </Marker>
+                        ))}
                     </MapView>
                 </View>
             )}

@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -8,15 +8,15 @@ import {
   Dimensions,
   Alert,
 } from 'react-native';
-import {CameraView, useCameraPermissions} from 'expo-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-const ScanScreen = ({onScanComplete, onBack}) => {
+const ScanScreen = ({ onScanComplete, onBack }) => {
   const [permission, requestPermission] = useCameraPermissions();
   const [showCamera, setShowCamera] = useState(false);
   const [scanned, setScanned] = useState(false);
-  
+
   const pulse1 = useRef(new Animated.Value(0.5)).current;
   const pulse2 = useRef(new Animated.Value(0.5)).current;
   const pulse3 = useRef(new Animated.Value(0.5)).current;
@@ -50,7 +50,7 @@ const ScanScreen = ({onScanComplete, onBack}) => {
 
   const handleScanPress = async () => {
     if (!permission) {
-      const {granted} = await requestPermission();
+      const { granted } = await requestPermission();
       if (!granted) {
         Alert.alert(
           'Permission requise',
@@ -62,12 +62,12 @@ const ScanScreen = ({onScanComplete, onBack}) => {
     setShowCamera(true);
   };
 
-  const handleBarCodeScanned = ({type, data}) => {
+  const handleBarCodeScanned = ({ type, data }) => {
     if (!scanned) {
       setScanned(true);
       setShowCamera(false);
       Alert.alert('QR Code scanné !', `Code: ${data}`, [
-        {text: 'OK', onPress: onScanComplete},
+        { text: 'OK', onPress: onScanComplete },
       ]);
     }
   };
@@ -142,16 +142,16 @@ const ScanScreen = ({onScanComplete, onBack}) => {
         {/* Animated corners */}
         <View style={styles.scanFrame}>
           <Animated.View
-            style={[styles.corner, styles.topLeft, {opacity: pulse1}]}
+            style={[styles.corner, styles.topLeft, { opacity: pulse1 }]}
           />
           <Animated.View
-            style={[styles.corner, styles.topRight, {opacity: pulse2}]}
+            style={[styles.corner, styles.topRight, { opacity: pulse2 }]}
           />
           <Animated.View
-            style={[styles.corner, styles.bottomLeft, {opacity: pulse3}]}
+            style={[styles.corner, styles.bottomLeft, { opacity: pulse3 }]}
           />
           <Animated.View
-            style={[styles.corner, styles.bottomRight, {opacity: pulse4}]}
+            style={[styles.corner, styles.bottomRight, { opacity: pulse4 }]}
           />
 
           {/* Center QR Icon */}
