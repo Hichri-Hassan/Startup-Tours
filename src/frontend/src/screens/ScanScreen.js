@@ -49,7 +49,7 @@ const ScanScreen = ({ onScanComplete, onBack }) => {
   }, []);
 
   const handleScanPress = async () => {
-    if (!permission) {
+    if (!permission?.granted) {
       const { granted } = await requestPermission();
       if (!granted) {
         Alert.alert(
@@ -66,9 +66,8 @@ const ScanScreen = ({ onScanComplete, onBack }) => {
     if (!scanned) {
       setScanned(true);
       setShowCamera(false);
-      Alert.alert('QR Code scanné !', `Code: ${data}`, [
-        { text: 'OK', onPress: onScanComplete },
-      ]);
+      // Redirect directly to data entry screen without popup
+      onScanComplete();
     }
   };
 

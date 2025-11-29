@@ -81,7 +81,10 @@ const App = () => {
                     />
                 )}
                 {currentScreen === 'entry' && (
-                    <DataEntryScreen onSubmit={handleDataSubmit} />
+                    <DataEntryScreen 
+                        onSubmit={handleDataSubmit}
+                        onBack={() => setCurrentScreen('scan')}
+                    />
                 )}
                 {currentScreen === 'waiting' && (
                     <WaitingScreen

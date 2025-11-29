@@ -10,32 +10,16 @@ import {
   Platform,
 } from 'react-native';
 
-const DataEntryScreen = ({onSubmit}) => {
+const DataEntryScreen = ({onSubmit, onBack}) => {
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
   const [mood, setMood] = useState('');
-  const [intention, setIntention] = useState('');
-  const [lookingFor, setLookingFor] = useState('');
   const [ageError, setAgeError] = useState('');
 
-  const moods = [
+  const moodOptions = [
     {id: 'chill', label: 'Chill', icon: '😌'},
     {id: 'social', label: 'Social', icon: '🤝'},
     {id: 'fun', label: 'Fun', icon: '🎉'},
-  ];
-
-  const intentions = [
-    {id: 'meet', label: 'Rencontrer des nouvelles personnes', icon: '👥'},
-    {id: 'romance', label: 'Rencontre amoureuse', icon: '❤️'},
-  ];
-
-  const lookingForOptions = [
-    {id: 'funny', label: "Quelqu'un de drôle"},
-    {id: 'spontaneous', label: 'Spontané(e)'},
-    {id: 'deep', label: 'Conversations profondes'},
-    {id: 'adventurous', label: 'Aventurier(e)'},
-    {id: 'chill', label: 'Ambiance chill'},
-    {id: 'energetic', label: 'Énergique'},
   ];
 
   const handleAgeChange = value => {
@@ -51,11 +35,8 @@ const DataEntryScreen = ({onSubmit}) => {
   };
 
   const handleSubmit = () => {
-    if (name && age && mood && intention && !ageError) {
-      if (intention === 'romance' && !lookingFor) {
-        return;
-      }
-      onSubmit({name, age, mood, intention, lookingFor});
+    if (name && age && mood && !ageError) {
+      onSubmit({name, age, mood, lookingFor: '', intention: mood});
     }
   };
 
@@ -63,15 +44,24 @@ const DataEntryScreen = ({onSubmit}) => {
     name.trim() &&
     age.trim() &&
     mood &&
-    intention &&
-    !ageError &&
-    (intention !== 'romance' || lookingFor);
+    !ageError;
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Back Button */}
+        {onBack && (
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={onBack}
+            activeOpacity={0.7}>
+            <Text style={styles.backArrow}>←</Text>
+            <Text style={styles.backText}>Retour</Text>
+          </TouchableOpacity>
+        )}
+
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Bienvenue !</Text>
@@ -108,67 +98,22 @@ const DataEntryScreen = ({onSubmit}) => {
 
         {/* Mood Selector */}
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Comment tu te sens ?</Text>
-          <View style={styles.moodContainer}>
-            {moods.map(m => (
-              <TouchableOpacity
-                key={m.id}
-                onPress={() => setMood(m.id)}
-                style={[
-                  styles.moodButton,
-                  mood === m.id && styles.moodButtonActive,
-                ]}>
-                <Text style={styles.moodIcon}>{m.icon}</Text>
-                <Text style={styles.moodLabel}>{m.label}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        {/* Intention Selector */}
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Ton intention ce soir</Text>
+          <Text style={styles.label}>Ton mood ce soir ?</Text>
           <View style={styles.intentionContainer}>
-            {intentions.map(int => (
+            {moodOptions.map(opt => (
               <TouchableOpacity
-                key={int.id}
-                onPress={() => setIntention(int.id)}
+                key={opt.id}
+                onPress={() => setMood(opt.id)}
                 style={[
                   styles.intentionButton,
-                  intention === int.id && styles.intentionButtonActive,
+                  mood === opt.id && styles.intentionButtonActive,
                 ]}>
-                <Text style={styles.intentionIcon}>{int.icon}</Text>
-                <Text style={styles.intentionLabel}>{int.label}</Text>
+                <Text style={styles.intentionIcon}>{opt.icon}</Text>
+                <Text style={styles.intentionLabel}>{opt.label}</Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
-
-        {/* Looking For (only if romance) */}
-        {intention === 'romance' && (
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Tu cherches...</Text>
-            <View style={styles.tagsContainer}>
-              {lookingForOptions.map(opt => (
-                <TouchableOpacity
-                  key={opt.id}
-                  onPress={() => setLookingFor(opt.id)}
-                  style={[
-                    styles.tag,
-                    lookingFor === opt.id && styles.tagActive,
-                  ]}>
-                  <Text
-                    style={[
-                      styles.tagText,
-                      lookingFor === opt.id && styles.tagTextActive,
-                    ]}>
-                    {opt.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </View>
-        )}
 
         {/* Submit Button */}
         <TouchableOpacity
@@ -191,6 +136,26 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 24,
     paddingBottom: 48,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: '#f2eded',
+    alignSelf: 'flex-start',
+  },
+  backArrow: {
+    fontSize: 24,
+    color: '#c12ec4',
+    marginRight: 4,
+  },
+  backText: {
+    fontSize: 16,
+    color: '#c12ec4',
+    fontWeight: '600',
   },
   header: {
     alignItems: 'center',
