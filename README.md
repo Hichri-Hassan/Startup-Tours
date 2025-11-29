@@ -1,76 +1,71 @@
-# MeetMe Game 🎮
+# Point ou Culture G - Application Mobile 🎮
 
-Application de rencontres gamifiée pour rencontrer de nouvelles personnes amicales ou amoureuses à travers des jeux amusants.
+Application React Native de rencontres gamifiées pour le Startup Weekend Tours.
 
-**Projet réalisé pendant le Startup Weekend**
+**Transformé depuis un mockup React web vers une application mobile complète !**
 
 ## 📱 Description
 
-MeetMe Game est une application mobile React Native qui permet aux utilisateurs de rencontrer de nouvelles personnes de manière ludique et interactive. Au lieu du traditionnel swipe, les utilisateurs jouent à des jeux amusants qui favorisent les conversations et les connexions authentiques.
+Point ou Culture G est une application mobile qui permet aux utilisateurs de rencontrer de nouvelles personnes (amicales ou amoureuses) dans des bars/événements via des jeux et des questions interactives. L'app utilise un système de scan QR pour rejoindre des soirées et matcher avec d'autres participants.
 
 ## ✨ Fonctionnalités
 
-- 🎮 **Plusieurs types de jeux** : Questions/Réponses, Devinettes, Vérité ou Action, Quiz de personnalité
-- 💬 **Chat en temps réel** : Discutez avec vos matches
-- 👤 **Profils personnalisés** : Créez et personnalisez votre profil
-- 🎯 **Matching intelligent** : Trouvez des personnes compatibles
-- ⚙️ **Paramètres personnalisables** : Type de rencontre, âge, distance, etc.
+### 🎯 Parcours Utilisateur Complet
+
+1. **Scan QR** - Scanne le QR code du bar pour rejoindre la soirée
+2. **Saisie de profil** - Renseigne ton prénom, âge, humeur et intention (amical ou romance)
+3. **Salle d'attente** - Animation pendant que d'autres rejoignent
+4. **Attribution de groupe** - Match automatique selon ton intention
+5. **Session de jeu** :
+   - **Mode Amis** : Questions brise-glace + suggestions de jeux de société
+   - **Mode Romance** : Jeu "Devine qui" avec indices progressifs
+6. **Timer de 12 minutes** avec changement de groupe automatique
+
+### 🎨 Caractéristiques Techniques
+
+- ✅ **6 écrans principaux** complètement fonctionnels
+- ✅ **Animations fluides** avec Animated API
+- ✅ **Design moderne** avec couleurs #c12ec4 (violet) et #e1a3ff (violet clair)
+- ✅ **Navigation fluide** entre les écrans
+- ✅ **Modales** pour confirmation de sortie
+- ✅ **Timer dynamique** avec compte à rebours
+- ✅ **États conditionnels** selon intention (amis vs romance)
 
 ## 🏗️ Structure du projet
 
 ```
 startup Weekend/
+├── App.js                    # Point d'entrée - Gestion de la navigation
 ├── src/
-│   ├── screens/          # Écrans de l'application
-│   │   ├── WelcomeScreen.js
-│   │   ├── LoginScreen.js
-│   │   ├── RegisterScreen.js
-│   │   ├── HomeScreen.js
-│   │   ├── GameScreen.js
-│   │   ├── GameResultScreen.js
-│   │   ├── ChatScreen.js
-│   │   ├── ProfileScreen.js
-│   │   └── SettingsScreen.js
-│   ├── components/       # Composants réutilisables
-│   │   ├── Button.js
-│   │   ├── Card.js
-│   │   ├── Input.js
-│   │   ├── Avatar.js
-│   │   └── Loading.js
-│   ├── navigation/       # Configuration de la navigation
-│   │   └── AppNavigator.js
-│   ├── services/         # Services API et stockage
-│   │   ├── api.js
-│   │   └── storage.js
-│   ├── utils/           # Fonctions utilitaires
-│   │   ├── helpers.js
-│   │   └── theme.js
-│   ├── context/         # Context API (Auth, etc.)
-│   │   └── AuthContext.js
-│   └── assets/          # Images, fonts, etc.
-│       ├── images/
-│       └── fonts/
-├── App.js              # Point d'entrée de l'application
-├── index.js            # Enregistrement de l'application
-├── package.json        # Dépendances du projet
-└── babel.config.js     # Configuration Babel
+│   ├── screens/
+│   │   ├── ScanScreen.js              # Écran de scan QR avec animations
+│   │   ├── DataEntryScreen.js         # Formulaire de saisie utilisateur
+│   │   ├── WaitingScreen.js           # Salle d'attente avec animations
+│   │   ├── GroupAssignmentScreen.js   # Attribution du groupe/match
+│   │   ├── QuestionScreen.js          # Questions + jeux (mode amis)
+│   │   └── GuessWhoScreen.js          # Jeu devine qui (mode romance)
+│   ├── components/          # Composants réutilisables (conservés)
+│   ├── services/           # API et stockage (conservés)
+│   └── utils/             # Helpers et thème (conservés)
+├── package.json
+└── README.md
 ```
 
-## 🚀 Installation
+## 🚀 Installation & Lancement
 
 ### Prérequis
 
-- Node.js (version 16 ou supérieure)
+- Node.js (version 16+)
 - npm ou yarn
 - React Native CLI
-- Pour iOS : Xcode et CocoaPods
-- Pour Android : Android Studio et SDK Android
+- Pour iOS : Xcode + CocoaPods
+- Pour Android : Android Studio + SDK
 
-### Étapes d'installation
+### Étapes
 
 1. **Cloner le repository**
    ```bash
-   git clone <votre-repo-url>
+   git clone https://github.com/Hichri-Hassan/Startup-Tours.git
    cd "startup Weekend"
    ```
 
@@ -81,77 +76,127 @@ startup Weekend/
    yarn install
    ```
 
-3. **Pour iOS : Installer les pods**
+3. **Pour iOS (Mac uniquement)**
    ```bash
-   cd ios
-   pod install
-   cd ..
+   cd ios && pod install && cd ..
+   npm run ios
    ```
 
-4. **Lancer l'application**
-   
-   Pour iOS :
-   ```bash
-   npm run ios
-   # ou
-   yarn ios
-   ```
-   
-   Pour Android :
+4. **Pour Android**
    ```bash
    npm run android
-   # ou
-   yarn android
    ```
 
-## 📦 Dépendances principales
+## 📦 Dépendances Principales
 
-- **React Native** : Framework mobile
-- **React Navigation** : Navigation entre écrans
-- **Axios** : Requêtes HTTP
-- **AsyncStorage** : Stockage local
-- **React Native Vector Icons** : Icônes
+```json
+{
+  "react": "18.2.0",
+  "react-native": "0.72.6",
+  "@react-navigation/native": "^6.1.9",
+  "@react-navigation/stack": "^6.3.20",
+  "react-native-reanimated": "^3.5.4",
+  "react-native-gesture-handler": "^2.13.4"
+}
+```
 
-## 🎨 Thème
+## 🎨 Design System
 
-L'application utilise une palette de couleurs cohérente :
-- Couleur principale : `#6B46C1` (Violet)
-- Couleur secondaire : `#3182CE` (Bleu)
-- Background : `#F7FAFC` (Gris clair)
+### Couleurs
+- **Primary** : `#c12ec4` (Violet)
+- **Primary Light** : `#e1a3ff` (Violet clair)
+- **Background** : `#f2eded` (Beige clair)
+- **Text Primary** : `#374151` (Gris foncé)
+- **Text Secondary** : `#6B7280` (Gris)
 
-## 📝 À faire (TODO)
+### Typographie
+- **Titres** : 24-28px, Bold
+- **Sous-titres** : 16-20px, Medium
+- **Corps** : 14-16px, Regular
 
-- [ ] Connecter l'API backend
-- [ ] Implémenter l'authentification réelle
-- [ ] Ajouter plus de types de jeux
-- [ ] Implémenter les notifications push
-- [ ] Ajouter la géolocalisation
-- [ ] Tests unitaires et d'intégration
-- [ ] Optimisation des performances
-- [ ] Mode sombre complet
+## 🔄 Transformation React → React Native
 
-## 🤝 Contribution
+### Ce qui a été transformé :
 
-Ce projet a été développé pendant un Startup Weekend. Les contributions sont les bienvenues !
+| React Web | React Native |
+|-----------|--------------|
+| `<div>` | `<View>` |
+| `<span>`, `<p>` | `<Text>` |
+| `<button>` | `<TouchableOpacity>` |
+| `<input>` | `<TextInput>` |
+| Tailwind CSS classes | StyleSheet API |
+| Framer Motion | Animated API |
+| CSS hover/transitions | Animation natives |
 
-1. Fork le projet
-2. Créez votre branche (`git checkout -b feature/AmazingFeature`)
-3. Commit vos changements (`git commit -m 'Add some AmazingFeature'`)
-4. Push vers la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrez une Pull Request
+### Écrans convertis :
+
+1. ✅ **ScanScreen** - QR scanning avec animations de coins pulsants
+2. ✅ **DataEntryScreen** - Formulaire avec validation d'âge
+3. ✅ **WaitingScreen** - Cercles animés + compteur de participants
+4. ✅ **GroupAssignmentScreen** - Affichage du groupe assigné
+5. ✅ **QuestionScreen** - Questions/jeux avec timer et changement de groupe
+6. ✅ **GuessWhoScreen** - Révélation progressive d'indices
+
+## 📝 Flux de Navigation
+
+```
+ScanScreen
+    ↓
+DataEntryScreen
+    ↓
+WaitingScreen
+    ↓
+GroupAssignmentScreen
+    ↓
+    ├→ QuestionScreen (si intention = "meet")
+    └→ GuessWhoScreen (si intention = "romance")
+```
+
+## 🎮 Jeux Disponibles
+
+### Mode Amis (QuestionScreen)
+- **Questions brise-glace** (8 questions variées)
+- **Jeux de société suggérés** :
+  - Time's Up 🎭
+  - Just One 💭
+  - Limite Limite 😈
+  - Story Cubes 🎲
+  - Blanc Manger Coco 🃏
+
+### Mode Romance (GuessWhoScreen)
+- **6 indices progressifs** à révéler
+- Découvre qui est ton match pas à pas
+- Interface intuitive avec cartes révélables
+
+## 🔧 Fonctionnalités Avancées
+
+- **Timer de session** : 12 minutes avec changement automatique de groupe
+- **Modales de confirmation** : Avant de quitter une session
+- **Animations fluides** : Cercles pulsants, transitions, effets de révélation
+- **Responsive** : S'adapte à toutes les tailles d'écran mobile
+- **États conditionnels** : Différents parcours selon l'intention utilisateur
+
+## 🚧 Améliorations Futures
+
+- [ ] Intégration scanner QR réel (react-native-qrcode-scanner)
+- [ ] Backend API pour matching réel
+- [ ] Système de chat entre matches
+- [ ] Notifications push
+- [ ] Profils utilisateurs complets
+- [ ] Géolocalisation des événements
+- [ ] Statistiques et historique
+- [ ] Mode sombre
 
 ## 📄 Licence
 
-Ce projet est sous licence MIT.
+Ce projet est développé pour le Startup Weekend Tours.
 
-## 👥 Équipe
+## 👥 Équipe Startup Weekend
 
-Projet développé pendant le Startup Weekend par l'équipe MeetMe Game.
-
-## 📞 Contact
-
-Pour toute question ou suggestion, n'hésitez pas à nous contacter !
+Développé avec ❤️ pendant le Startup Weekend Tours
 
 ---
 
-Fait avec ❤️ pendant le Startup Weekend
+**Status** : ✅ **Transformation React → React Native COMPLÉTÉE !**
+
+Tous les écrans ont été convertis et sont fonctionnels. L'application est prête à être testée sur iOS et Android.
