@@ -51,7 +51,7 @@ const boardGames = [
   },
 ];
 
-const QuestionScreen = ({ onReset, groupMembers }) => {
+const QuestionScreen = ({ onReset, groupMembers, onStartChallenge }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [showGroupChange, setShowGroupChange] = useState(false);
   const [activityType, setActivityType] = useState(
@@ -207,6 +207,14 @@ const QuestionScreen = ({ onReset, groupMembers }) => {
           activeOpacity={0.8}>
           <Text style={styles.nextButtonText}>Question/Jeu suivant</Text>
           <Text style={styles.nextButtonIcon}>→</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.challengeButton}
+          onPress={onStartChallenge}
+          activeOpacity={0.8}>
+          <Text style={styles.challengeButtonIcon}>🎯</Text>
+          <Text style={styles.challengeButtonText}>Défi 2v2</Text>
         </TouchableOpacity>
       </ScrollView>
 
@@ -492,6 +500,31 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  challengeButton: {
+    flexDirection: 'row',
+    backgroundColor: '#c12ec4',
+    borderRadius: 25,
+    paddingVertical: 18,
+    paddingHorizontal: 24,
+    marginTop: 16,
+    marginHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#c12ec4',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  challengeButtonIcon: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  challengeButtonText: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 

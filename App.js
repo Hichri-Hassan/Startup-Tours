@@ -8,6 +8,7 @@ import WaitingScreen from './src/screens/WaitingScreen';
 import GroupAssignmentScreen from './src/screens/GroupAssignmentScreen';
 import QuestionScreen from './src/screens/QuestionScreen';
 import GuessWhoScreen from './src/screens/GuessWhoScreen';
+import ChallengeScreen from './src/screens/ChallengeScreen';
 
 const App = () => {
   const [currentScreen, setCurrentScreen] = useState('home');
@@ -58,6 +59,14 @@ const App = () => {
     setUserData({name: '', mood: '', intention: '', age: '', lookingFor: ''});
   };
 
+  const handleStartChallenge = () => {
+    setCurrentScreen('challenge');
+  };
+
+  const handleBackToQuestions = () => {
+    setCurrentScreen('questions');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="dark" />
@@ -91,6 +100,7 @@ const App = () => {
           <QuestionScreen
             onReset={handleBackToScan}
             groupMembers={groupMembers}
+            onStartChallenge={handleStartChallenge}
           />
         )}
         {currentScreen === 'guesswho' && (
@@ -98,6 +108,9 @@ const App = () => {
             onReset={handleBackToScan}
             groupMembers={groupMembers}
           />
+        )}
+        {currentScreen === 'challenge' && (
+          <ChallengeScreen onBack={handleBackToQuestions} />
         )}
       </View>
     </SafeAreaView>
