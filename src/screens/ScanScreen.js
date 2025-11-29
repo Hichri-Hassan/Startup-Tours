@@ -12,7 +12,7 @@ import {CameraView, useCameraPermissions} from 'expo-camera';
 
 const {width} = Dimensions.get('window');
 
-const ScanScreen = ({onScanComplete}) => {
+const ScanScreen = ({onScanComplete, onBack}) => {
   const [permission, requestPermission] = useCameraPermissions();
   const [showCamera, setShowCamera] = useState(false);
   const [scanned, setScanned] = useState(false);
@@ -115,6 +115,17 @@ const ScanScreen = ({onScanComplete}) => {
 
   return (
     <View style={styles.container}>
+      {/* Back Button */}
+      {onBack && (
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={onBack}
+          activeOpacity={0.7}>
+          <Text style={styles.backArrow}>←</Text>
+          <Text style={styles.backText}>Retour</Text>
+        </TouchableOpacity>
+      )}
+
       {/* Logo / Title */}
       <View style={styles.header}>
         <Text style={styles.title}>Point ou Culture G</Text>
@@ -179,6 +190,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 24,
     backgroundColor: '#ffffff',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 60,
+    left: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    zIndex: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    backgroundColor: '#f2eded',
+  },
+  backArrow: {
+    fontSize: 24,
+    color: '#c12ec4',
+    marginRight: 4,
+  },
+  backText: {
+    fontSize: 16,
+    color: '#c12ec4',
+    fontWeight: '600',
   },
   header: {
     alignItems: 'center',

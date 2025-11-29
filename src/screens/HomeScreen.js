@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -6,8 +6,10 @@ import {
     TextInput,
     TouchableOpacity,
     ScrollView,
-    Image,
 } from 'react-native';
+import MapView, { Marker, PROVIDER_DEFAULT } from 'react-native-maps';
+import * as Location from 'expo-location';
+import { Ionicons } from '@expo/vector-icons';
 
 const bars = [
     {
@@ -19,6 +21,8 @@ const bars = [
         image: '🍺',
         hours: 'Ouvert jusqu\'à 02:00',
         popular: true,
+        latitude: 47.3941,
+        longitude: 0.6848,
     },
     {
         id: 2,
@@ -29,6 +33,8 @@ const bars = [
         image: '🎨',
         hours: 'Ouvert jusqu\'à 00:00',
         popular: false,
+        latitude: 47.3950,
+        longitude: 0.6860,
     },
     {
         id: 3,
@@ -39,6 +45,8 @@ const bars = [
         image: '🍷',
         hours: 'Ouvert jusqu\'à 01:00',
         popular: true,
+        latitude: 47.3955,
+        longitude: 0.6820,
     },
     {
         id: 4,
@@ -49,12 +57,26 @@ const bars = [
         image: '🍀',
         hours: 'Ouvert jusqu\'à 02:00',
         popular: false,
+        latitude: 47.3930,
+        longitude: 0.6835,
     },
 ];
 
 const HomeScreen = ({ onScanPress }) => {
     const [viewMode, setViewMode] = useState('liste');
     const [searchQuery, setSearchQuery] = useState('');
+    const [location, setLocation] = useState(null);
+
+    useEffect(() => {
+        (async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                return;
+            }
+            let location = await Location.getCurrentPositionAsync({});
+            setLocation(location);
+        })();
+    }, []);
 
     return (
         <View style={styles.container}>
@@ -92,7 +114,8 @@ const HomeScreen = ({ onScanPress }) => {
                         style={[
                             styles.toggleText,
                             viewMode === 'liste' && styles.toggleTextActive,
-                        ]}>
+                        ]}
+                        onPress={() => setViewMode("map")}>
                         Liste
                     </Text>
                 </TouchableOpacity>
@@ -165,9 +188,41 @@ const HomeScreen = ({ onScanPress }) => {
                     ))}
                 </ScrollView>
             ) : (
-                <View style={styles.mapPlaceholder}>
-                    <Text style={styles.mapPlaceholderEmoji}>🗺️</Text>
-                    <Text style={styles.mapPlaceholderText}>Vue carte à venir</Text>
+                <View style={styles.mapWrapper}>
+                    <MapView
+                        style={styles.map}
+                        provider={PROVIDER_DEFAULT}
+                        showsUserLocation={true}
+                        showsMyLocationButton={true}
+                        followsUserLocation={true}
+                        initialRegion={{
+                            latitude: location?.coords?.latitude || 47.3941,
+                            longitude: location?.coords?.longitude || 0.6848,
+                            latitudeDelta: 0.01,
+                            longitudeDelta: 0.01,
+                        }}>
+                    {bars.map(bar => (
+                        <Marker
+                            key={bar.id}
+                            coordinate={{
+                                latitude: bar.latitude,
+                                longitude: bar.longitude,
+                            }}
+                            title={bar.name}
+                            description={bar.address}>
+                            <View style={styles.markerContainer}>
+                                <View style={styles.markerBubble}>
+                                    <Text style={styles.markerEmoji}>{bar.image}</Text>
+                                </View>
+                                {bar.popular && (
+                                    <View style={styles.markerBadge}>
+                                        <Text style={styles.markerBadgeText}>⭐</Text>
+                                    </View>
+                                )}
+                            </View>
+                        </Marker>
+                    ))}
+                    </MapView>
                 </View>
             )}
 
@@ -176,10 +231,7 @@ const HomeScreen = ({ onScanPress }) => {
                 style={styles.floatingButton}
                 onPress={onScanPress}
                 activeOpacity={0.8}>
-                <Image 
-                    source={{uri: 'file:///Users/hassenhicheri/Desktop/Image.png'}}
-                    style={styles.floatingButtonImage}
-                />
+                <Ionicons name="qr-code" size={32} color="#ffffff" />
             </TouchableOpacity>
         </View>
     );
@@ -393,6 +445,52 @@ const styles = StyleSheet.create({
         color: '#c12ec4',
         fontWeight: '500',
     },
+    mapWrapper: {
+        flex: 1,
+        marginHorizontal: 16,
+        marginBottom: 100,
+        borderRadius: 16,
+        overflow: 'hidden',
+    },
+    map: {
+        flex: 1,
+    },
+    markerContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    markerBubble: {
+        backgroundColor: '#ffffff',
+        borderRadius: 20,
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: '#c12ec4',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    markerEmoji: {
+        fontSize: 20,
+    },
+    markerBadge: {
+        position: 'absolute',
+        top: -5,
+        right: -5,
+        backgroundColor: '#c12ec4',
+        borderRadius: 10,
+        width: 20,
+        height: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    markerBadgeText: {
+        fontSize: 12,
+    },
     mapPlaceholder: {
         flex: 1,
         justifyContent: 'center',
@@ -425,11 +523,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 8,
         elevation: 8,
-    },
-    floatingButtonImage: {
-        width: 40,
-        height: 40,
-        tintColor: '#ffffff',
     },
 });
 

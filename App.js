@@ -66,7 +66,10 @@ const App = () => {
           <HomeScreen onScanPress={handleOpenScanner} />
         )}
         {currentScreen === 'scan' && (
-          <ScanScreen onScanComplete={handleScanComplete} />
+          <ScanScreen 
+            onScanComplete={handleScanComplete}
+            onBack={() => setCurrentScreen('home')}
+          />
         )}
         {currentScreen === 'entry' && (
           <DataEntryScreen onSubmit={handleDataSubmit} />

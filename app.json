@@ -11,10 +11,32 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.meetmegame.app"
+      "bundleIdentifier": "com.meetmegame.app",
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Cette application utilise votre localisation pour afficher les bars à proximité.",
+        "NSLocationAlwaysUsageDescription": "Cette application utilise votre localisation pour vous proposer les meilleurs bars."
+      }
     },
     "android": {
-      "package": "com.meetmegame.app"
-    }
+      "package": "com.meetmegame.app",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+        }
+      ]
+    ]
   }
 }
