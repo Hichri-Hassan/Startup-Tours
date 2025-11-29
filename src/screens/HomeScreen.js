@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
+    Image,
     StyleSheet,
     TextInput,
     TouchableOpacity,
@@ -112,9 +113,11 @@ const HomeScreen = ({ onScanPress }) => {
                             )}
 
                             <View style={styles.barImageContainer}>
-                                <View style={styles.barImage}>
-                                    <Text style={styles.barEmoji}>{bar.image}</Text>
-                                </View>
+                                <Image
+                                    source={{ uri: bar.image }}
+                                    style={styles.barImage}
+                                    resizeMode="cover"
+                                />
                                 <TouchableOpacity style={styles.favoriteButton}>
                                     <Text style={styles.favoriteIcon}>🤍</Text>
                                 </TouchableOpacity>
@@ -333,8 +336,6 @@ const styles = StyleSheet.create({
     barImage: {
         width: '100%',
         height: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
     },
     barEmoji: {
         fontSize: 80,
