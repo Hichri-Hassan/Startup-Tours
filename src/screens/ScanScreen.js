@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -6,11 +6,17 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
+  Alert,
 } from 'react-native';
+import {CameraView, useCameraPermissions} from 'expo-camera';
 
 const {width} = Dimensions.get('window');
 
 const ScanScreen = ({onScanComplete}) => {
+  const [permission, requestPermission] = useCameraPermissions();
+  const [showCamera, setShowCamera] = useState(false);
+  const [scanned, setScanned] = useState(false);
+  
   const pulse1 = useRef(new Animated.Value(0.5)).current;
   const pulse2 = useRef(new Animated.Value(0.5)).current;
   const pulse3 = useRef(new Animated.Value(0.5)).current;
@@ -41,6 +47,71 @@ const ScanScreen = ({onScanComplete}) => {
     animateCorner(pulse3, 1000);
     animateCorner(pulse4, 1500);
   }, []);
+
+  const handleScanPress = async () => {
+    if (!permission) {
+      const {granted} = await requestPermission();
+      if (!granted) {
+        Alert.alert(
+          'Permission requise',
+          'Nous avons besoin d\'accéder à votre caméra pour scanner le QR code.',
+        );
+        return;
+      }
+    }
+    setShowCamera(true);
+  };
+
+  const handleBarCodeScanned = ({type, data}) => {
+    if (!scanned) {
+      setScanned(true);
+      setShowCamera(false);
+      Alert.alert('QR Code scanné !', `Code: ${data}`, [
+        {text: 'OK', onPress: onScanComplete},
+      ]);
+    }
+  };
+
+  if (showCamera) {
+    return (
+      <View style={styles.cameraContainer}>
+        <CameraView
+          style={styles.camera}
+          facing="back"
+          onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
+          barcodeScannerSettings={{
+            barcodeTypes: ['qr'],
+          }}>
+          <View style={styles.cameraOverlay}>
+            <View style={styles.cameraHeader}>
+              <Text style={styles.cameraTitle}>Scannez le QR Code</Text>
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => {
+                  setShowCamera(false);
+                  setScanned(false);
+                }}>
+                <Text style={styles.closeButtonText}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.scanAreaContainer}>
+              <View style={styles.scanArea}>
+                <View style={[styles.scanCorner, styles.scanTopLeft]} />
+                <View style={[styles.scanCorner, styles.scanTopRight]} />
+                <View style={[styles.scanCorner, styles.scanBottomLeft]} />
+                <View style={[styles.scanCorner, styles.scanBottomRight]} />
+              </View>
+            </View>
+
+            <Text style={styles.cameraInstruction}>
+              Positionnez le QR code dans le cadre
+            </Text>
+          </View>
+        </CameraView>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -82,9 +153,9 @@ const ScanScreen = ({onScanComplete}) => {
       {/* Primary CTA */}
       <TouchableOpacity
         style={styles.primaryButton}
-        onPress={onScanComplete}
+        onPress={handleScanPress}
         activeOpacity={0.8}>
-        <Text style={styles.primaryButtonText}>Simuler le scan</Text>
+        <Text style={styles.primaryButtonText}>📷 Scanner le QR Code</Text>
       </TouchableOpacity>
 
       {/* Secondary CTA */}
@@ -94,7 +165,7 @@ const ScanScreen = ({onScanComplete}) => {
         activeOpacity={0.6}>
         <Text style={styles.secondaryIcon}>🔑</Text>
         <Text style={styles.secondaryButtonText}>
-          Entrer le code manuellement
+          Simuler le scan (démo)
         </Text>
       </TouchableOpacity>
     </View>
@@ -217,6 +288,92 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     color: '#6B7280',
     fontSize: 14,
+  },
+  // Camera styles
+  cameraContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  camera: {
+    flex: 1,
+  },
+  cameraOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  cameraHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 60,
+    paddingHorizontal: 20,
+    marginBottom: 40,
+  },
+  cameraTitle: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  closeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  scanAreaContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scanArea: {
+    width: 280,
+    height: 280,
+    position: 'relative',
+  },
+  scanCorner: {
+    position: 'absolute',
+    width: 40,
+    height: 40,
+    borderColor: '#e1a3ff',
+    borderWidth: 4,
+  },
+  scanTopLeft: {
+    top: 0,
+    left: 0,
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
+  },
+  scanTopRight: {
+    top: 0,
+    right: 0,
+    borderLeftWidth: 0,
+    borderBottomWidth: 0,
+  },
+  scanBottomLeft: {
+    bottom: 0,
+    left: 0,
+    borderRightWidth: 0,
+    borderTopWidth: 0,
+  },
+  scanBottomRight: {
+    bottom: 0,
+    right: 0,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+  },
+  cameraInstruction: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+    paddingBottom: 100,
+    paddingHorizontal: 40,
   },
 });
 

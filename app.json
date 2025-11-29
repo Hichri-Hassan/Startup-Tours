@@ -1,5 +1,20 @@
 {
-  "name": "MeetMeGame",
-  "displayName": "MeetMe Game",
-  "description": "Rencontrez de nouvelles personnes à travers des jeux amusants"
+  "expo": {
+    "name": "MeetMe Game",
+    "slug": "meetme-game",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#c12ec4",
+      "resizeMode": "contain"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.meetmegame.app"
+    },
+    "android": {
+      "package": "com.meetmegame.app"
+    }
+  }
 }

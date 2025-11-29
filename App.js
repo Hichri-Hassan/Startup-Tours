@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
-import {SafeAreaView, StatusBar, StyleSheet, View} from 'react-native';
+import {SafeAreaView, StyleSheet, View} from 'react-native';
+import {StatusBar} from 'expo-status-bar';
 import ScanScreen from './src/screens/ScanScreen';
 import DataEntryScreen from './src/screens/DataEntryScreen';
 import WaitingScreen from './src/screens/WaitingScreen';
@@ -54,7 +55,7 @@ const App = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar style="dark" />
       <View style={styles.content}>
         {currentScreen === 'scan' && (
           <ScanScreen onScanComplete={handleScanComplete} />

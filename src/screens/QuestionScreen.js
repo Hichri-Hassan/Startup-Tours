@@ -253,7 +253,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 20,
-    paddingTop: 12,
+    paddingTop: 40,
+    marginTop: 20,
   },
   timerContainer: {
     flexDirection: 'row',
@@ -286,11 +287,12 @@ const styles = StyleSheet.create({
   content: {
     flexGrow: 1,
     padding: 24,
-    paddingTop: 0,
+    paddingTop: 48,
   },
   activityContainer: {
     alignItems: 'center',
     marginBottom: 32,
+    marginTop: 60,
   },
   activityIcon: {
     width: 80,
