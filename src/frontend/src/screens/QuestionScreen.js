@@ -14,6 +14,8 @@ const QuestionScreen = ({ onReset, groupMembers, onStartChallenge }) => {
   const [currentQuestion, setCurrentQuestion] = useState(getRandomQuestion());
   const [currentChallenge, setCurrentChallenge] = useState(null);
   const [showGroupChange, setShowGroupChange] = useState(false);
+  const [showBreak, setShowBreak] = useState(false);
+  const [breakTimeRemaining, setBreakTimeRemaining] = useState(5 * 60); // 5 minutes
   const [activityType, setActivityType] = useState('question');
   const [showExitModal, setShowExitModal] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState(60); // 1 minute per question
@@ -23,10 +25,30 @@ const QuestionScreen = ({ onReset, groupMembers, onStartChallenge }) => {
   const [challengeValidated, setChallengeValidated] = useState(false);
   const [teamScore, setTeamScore] = useState(0);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [validationState, setValidationState] = useState(null); // 'waiting', 'player1_claimed', 'player2_claimed', 'validated', 'rejected'
+  const [playerClaim, setPlayerClaim] = useState(null); // 'player1', 'player2'
+  const [opponentResponse, setOpponentResponse] = useState(null); // For demo: simulate opponent actions
 
   useEffect(() => {
-    // Don't run timer during challenges
-    if (activityType === 'challenge') {
+    // Timer for break
+    if (showBreak) {
+      const breakTimer = setInterval(() => {
+        setBreakTimeRemaining(prev => {
+          if (prev <= 1) {
+            clearInterval(breakTimer);
+            setShowBreak(false);
+            setBreakTimeRemaining(5 * 60);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(breakTimer);
+    }
+
+    // Don't run timer during challenges or when showing break/group change
+    if (activityType === 'challenge' || showGroupChange) {
       return;
     }
 
@@ -43,7 +65,7 @@ const QuestionScreen = ({ onReset, groupMembers, onStartChallenge }) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [currentQuestion, activityType]);
+  }, [currentQuestion, activityType, showBreak, showGroupChange]);
 
   const formatTime = seconds => {
     const mins = Math.floor(seconds / 60);
@@ -52,12 +74,77 @@ const QuestionScreen = ({ onReset, groupMembers, onStartChallenge }) => {
   };
 
   const handleValidateChallenge = () => {
-    setChallengeValidated(true);
-    setTeamScore(prev => prev + 4);
+    if (currentChallenge?.type === '1v1' || currentChallenge?.type === '2v2') {
+      // Player claims victory - I won!
+      setValidationState('player1_claimed');
+      setPlayerClaim('player1');
+      
+      // Simulate opponent response after a delay
+      setTimeout(() => {
+        const opponentAccepts = Math.random() > 0.3; // 70% chance they accept
+        if (opponentAccepts) {
+          setOpponentResponse('accepted');
+          setValidationState('validated');
+          setChallengeValidated(true);
+          setTeamScore(prev => prev + 4); // I win +4 points
+        } else {
+          setOpponentResponse('rejected');
+          setValidationState('rejected');
+          setChallengeValidated(true);
+          setTeamScore(prev => Math.max(0, prev - 1)); // Both lose 1 point
+        }
+      }, 2000);
+    } else {
+      // Solo challenge - direct validation
+      setChallengeValidated(true);
+      setTeamScore(prev => prev + 4);
+    }
   };
+
+  const handleAcceptOpponentClaim = () => {
+    // Opponent wins, I accept
+    setOpponentResponse('accepted');
+    setValidationState('validated');
+    setChallengeValidated(true);
+    // No points for me, opponent gets the points
+  };
+
+  const handleRejectOpponentClaim = () => {
+    // I reject opponent's claim
+    setOpponentResponse('rejected');
+    setValidationState('rejected');
+    setChallengeValidated(true);
+    setTeamScore(prev => Math.max(0, prev - 1)); // Both lose 1 point
+  };
+
+  // Simulate opponent claiming victory first (30% chance after 3 seconds)
+  useEffect(() => {
+    if (activityType === 'challenge' && 
+        (currentChallenge?.type === '1v1' || currentChallenge?.type === '2v2') && 
+        !validationState && 
+        !challengeValidated) {
+      
+      const opponentClaimsFirst = Math.random() > 0.7; // 30% chance
+      
+      if (opponentClaimsFirst) {
+        const timer = setTimeout(() => {
+          if (!validationState && !challengeValidated) {
+            // Opponent claims victory first
+            setValidationState('player2_claimed');
+            setPlayerClaim('player2');
+          }
+        }, 3000); // After 3 seconds
+        
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [activityType, currentChallenge, validationState, challengeValidated]);
 
   const handleFailChallenge = () => {
     setChallengeValidated(true);
+    setValidationState(null);
+    setPlayerClaim(null);
+    setOpponentResponse(null);
     // No points added for failed challenge
   };
 
@@ -71,8 +158,9 @@ const QuestionScreen = ({ onReset, groupMembers, onStartChallenge }) => {
       return;
     }
 
+    // Show break every 5 activities (before group change)
     if (newClickCount % 5 === 0) {
-      setShowGroupChange(true);
+      setShowBreak(true);
       return;
     }
 
@@ -92,6 +180,9 @@ const QuestionScreen = ({ onReset, groupMembers, onStartChallenge }) => {
       setUsedChallengeIds([...usedChallengeIds, newChallenge.id]);
       setActivityType('challenge');
       setChallengeValidated(false);
+      setValidationState(null);
+      setPlayerClaim(null);
+      setOpponentResponse(null);
       setTimeRemaining(60);
     }
   };
@@ -106,6 +197,17 @@ const QuestionScreen = ({ onReset, groupMembers, onStartChallenge }) => {
     setActivityType('question');
     setChallengeValidated(false);
     setTimeRemaining(60);
+  };
+
+  const handleContinueAfterBreak = () => {
+    setShowBreak(false);
+    setShowGroupChange(true);
+  };
+
+  const handleSkipBreak = () => {
+    setShowBreak(false);
+    setBreakTimeRemaining(5 * 60);
+    setShowGroupChange(true);
   };
 
   if (showLeaderboard) {
@@ -157,6 +259,38 @@ const QuestionScreen = ({ onReset, groupMembers, onStartChallenge }) => {
             onPress={onReset}
             activeOpacity={0.8}>
             <Text style={styles.continueButtonText}>Retour à l'accueil</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  if (showBreak) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.changeContainer}>
+          <View style={styles.breakIcon}>
+            <Text style={styles.changeIconText}>☕</Text>
+          </View>
+
+          <Text style={styles.changeTitle}>Pause de 5 minutes !</Text>
+          <Text style={styles.changeSubtitle}>
+            Profitez-en pour vous détendre, aller aux toilettes ou prendre un verre 🍹
+          </Text>
+
+          <View style={styles.breakTimerCard}>
+            <Text style={styles.breakTimerLabel}>Temps restant</Text>
+            <Text style={styles.breakTimerText}>{formatTime(breakTimeRemaining)}</Text>
+            <Text style={styles.breakTimerSubtext}>
+              La session reprendra automatiquement
+            </Text>
+          </View>
+
+          <TouchableOpacity
+            style={styles.skipBreakButton}
+            onPress={handleSkipBreak}
+            activeOpacity={0.8}>
+            <Text style={styles.skipBreakButtonText}>Passer la pause</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -241,7 +375,9 @@ const QuestionScreen = ({ onReset, groupMembers, onStartChallenge }) => {
             <View style={styles.activityIcon}>
               <Text style={styles.activityIconText}>🎯</Text>
             </View>
-            <Text style={styles.activityTitle}>Défi</Text>
+            <Text style={styles.activityTitle}>
+              Défi {currentChallenge?.type === '1v1' ? '1v1' : currentChallenge?.type === '2v2' ? '2v2' : 'Solo'}
+            </Text>
             <View style={styles.gameCard}>
               <Text style={styles.gameName}>Challenge !</Text>
               <Text style={styles.gameDescription}>
@@ -249,7 +385,72 @@ const QuestionScreen = ({ onReset, groupMembers, onStartChallenge }) => {
               </Text>
             </View>
             
-            {!challengeValidated && (
+            {/* Validation pour challenges 1v1 et 2v2 */}
+            {(currentChallenge?.type === '1v1' || currentChallenge?.type === '2v2') && !challengeValidated && (
+              <>
+                {!validationState && (
+                  <View style={styles.challengeButtons}>
+                    <TouchableOpacity
+                      style={styles.validateButton}
+                      onPress={handleValidateChallenge}
+                      activeOpacity={0.8}>
+                      <Text style={styles.validateButtonText}>
+                        🏆 J'ai gagné ! (+4 pts)
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.failButton}
+                      onPress={handleFailChallenge}
+                      activeOpacity={0.8}>
+                      <Text style={styles.failButtonText}>✗ Abandonner</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+
+                {validationState === 'player1_claimed' && !opponentResponse && (
+                  <View style={styles.validationWaiting}>
+                    <Text style={styles.validationWaitingIcon}>⏳</Text>
+                    <Text style={styles.validationWaitingText}>
+                      Tu as revendiqué la victoire !
+                    </Text>
+                    <Text style={styles.validationWaitingSubtext}>
+                      {currentChallenge?.type === '1v1' 
+                        ? 'En attente que ton adversaire confirme que TU as gagné...'
+                        : 'En attente que l\'autre équipe confirme que VOUS avez gagné...'}
+                    </Text>
+                  </View>
+                )}
+
+                {validationState === 'player2_claimed' && (
+                  <View style={styles.opponentClaimCard}>
+                    <Text style={styles.opponentClaimIcon}>⚔️</Text>
+                    <Text style={styles.opponentClaimTitle}>
+                      Ton adversaire revendique la victoire !
+                    </Text>
+                    <Text style={styles.opponentClaimText}>
+                      Il/Elle prétend avoir gagné. Est-ce que tu acceptes SA victoire ?
+                    </Text>
+                    <View style={styles.opponentClaimButtons}>
+                      <TouchableOpacity
+                        style={styles.acceptButton}
+                        onPress={handleAcceptOpponentClaim}
+                        activeOpacity={0.8}>
+                        <Text style={styles.acceptButtonText}>✓ Oui, il/elle a gagné</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.rejectButton}
+                        onPress={handleRejectOpponentClaim}
+                        activeOpacity={0.8}>
+                        <Text style={styles.rejectButtonText}>✗ Non ! (-1 pt chacun)</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+              </>
+            )}
+
+            {/* Validation pour challenges solo */}
+            {currentChallenge?.type === 'solo' && !challengeValidated && (
               <View style={styles.challengeButtons}>
                 <TouchableOpacity
                   style={styles.validateButton}
@@ -266,7 +467,25 @@ const QuestionScreen = ({ onReset, groupMembers, onStartChallenge }) => {
               </View>
             )}
             
-            {challengeValidated && (
+            {challengeValidated && validationState === 'validated' && (
+              <View style={styles.validatedBadge}>
+                <Text style={styles.validatedBadgeText}>
+                  {playerClaim === 'player1' 
+                    ? '🏆 Victoire confirmée ! TU as gagné +4 pts' 
+                    : '😔 Ton adversaire a gagné'}
+                </Text>
+              </View>
+            )}
+
+            {challengeValidated && validationState === 'rejected' && (
+              <View style={styles.rejectedBadge}>
+                <Text style={styles.rejectedBadgeText}>
+                  ⚠️ Désaccord ! Vous perdez tous les deux -1 pt
+                </Text>
+              </View>
+            )}
+
+            {challengeValidated && !validationState && (
               <View style={styles.validatedBadge}>
                 <Text style={styles.validatedBadgeText}>Validé !</Text>
               </View>
@@ -519,6 +738,102 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  rejectedBadge: {
+    backgroundColor: '#fee2e2',
+    borderRadius: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    marginTop: 24,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#ef4444',
+  },
+  rejectedBadgeText: {
+    color: '#991b1b',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  validationWaiting: {
+    backgroundColor: '#fef3c7',
+    borderRadius: 20,
+    padding: 24,
+    marginTop: 24,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#f59e0b',
+  },
+  validationWaitingIcon: {
+    fontSize: 40,
+    marginBottom: 12,
+  },
+  validationWaitingText: {
+    color: '#92400e',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  validationWaitingSubtext: {
+    color: '#92400e',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  opponentClaimCard: {
+    backgroundColor: '#fef2f2',
+    borderRadius: 20,
+    padding: 24,
+    marginTop: 24,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#ef4444',
+  },
+  opponentClaimIcon: {
+    fontSize: 40,
+    marginBottom: 12,
+  },
+  opponentClaimTitle: {
+    color: '#991b1b',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  opponentClaimText: {
+    color: '#991b1b',
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  opponentClaimButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '100%',
+  },
+  acceptButton: {
+    flex: 1,
+    backgroundColor: '#10b981',
+    borderRadius: 20,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  acceptButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  rejectButton: {
+    flex: 1,
+    backgroundColor: '#ef4444',
+    borderRadius: 20,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  rejectButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   leaderboardContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -619,6 +934,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
+  breakIcon: {
+    width: 96,
+    height: 96,
+    backgroundColor: '#fef3c7',
+    borderRadius: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
   changeIconText: {
     fontSize: 48,
   },
@@ -673,6 +997,44 @@ const styles = StyleSheet.create({
   },
   continueButtonText: {
     color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  breakTimerCard: {
+    backgroundColor: '#f2eded',
+    borderRadius: 24,
+    padding: 32,
+    width: '100%',
+    marginBottom: 24,
+    alignItems: 'center',
+  },
+  breakTimerLabel: {
+    fontSize: 16,
+    color: '#6B7280',
+    marginBottom: 12,
+  },
+  breakTimerText: {
+    fontSize: 56,
+    fontWeight: 'bold',
+    color: '#c12ec4',
+    marginBottom: 8,
+  },
+  breakTimerSubtext: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
+  },
+  skipBreakButton: {
+    width: '100%',
+    backgroundColor: '#f2eded',
+    borderRadius: 25,
+    paddingVertical: 16,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#c12ec4',
+  },
+  skipBreakButtonText: {
+    color: '#c12ec4',
     fontSize: 16,
     fontWeight: '600',
   },
