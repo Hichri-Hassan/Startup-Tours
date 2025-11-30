@@ -28,6 +28,8 @@ const QuestionScreen = ({ onReset, groupMembers, onStartChallenge }) => {
   const [validationState, setValidationState] = useState(null); // 'waiting', 'player1_claimed', 'player2_claimed', 'validated', 'rejected'
   const [playerClaim, setPlayerClaim] = useState(null); // 'player1', 'player2'
   const [opponentResponse, setOpponentResponse] = useState(null); // For demo: simulate opponent actions
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportedPlayers, setReportedPlayers] = useState([]);
 
   useEffect(() => {
     // Timer for break
@@ -210,6 +212,12 @@ const QuestionScreen = ({ onReset, groupMembers, onStartChallenge }) => {
     setShowGroupChange(true);
   };
 
+  const handleReportPlayer = (playerName) => {
+    setReportedPlayers([...reportedPlayers, playerName]);
+    setShowReportModal(false);
+    // In a real app, this would send a report to the server
+  };
+
   if (showLeaderboard) {
     const leaderboardData = [
       { rank: 1, team: 'Ton équipe', score: teamScore, isCurrentTeam: true },
@@ -348,11 +356,19 @@ const QuestionScreen = ({ onReset, groupMembers, onStartChallenge }) => {
           </View>
         )}
 
-        <TouchableOpacity
-          style={styles.exitButton}
-          onPress={() => setShowExitModal(true)}>
-          <Text style={styles.exitIcon}>🚪</Text>
-        </TouchableOpacity>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            style={styles.reportButton}
+            onPress={() => setShowReportModal(true)}>
+            <Text style={styles.reportIcon}>⚠️</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.exitButton}
+            onPress={() => setShowExitModal(true)}>
+            <Text style={styles.exitIcon}>🚪</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView
@@ -508,6 +524,75 @@ const QuestionScreen = ({ onReset, groupMembers, onStartChallenge }) => {
         </TouchableOpacity>
       </ScrollView>
 
+      {/* Report Modal */}
+      <Modal
+        visible={showReportModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowReportModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalIcon}>⚠️</Text>
+            <Text style={styles.modalTitle}>Signaler une personne</Text>
+            <Text style={styles.modalText}>
+              Quelqu'un dans le groupe est relou ou a un comportement inapproprié ?
+            </Text>
+
+            <View style={styles.reportPlayersList}>
+              {groupMembers && groupMembers.length > 0 ? (
+                groupMembers.map((memberName, i) => (
+                  <TouchableOpacity
+                    key={i}
+                    style={[
+                      styles.reportPlayerButton,
+                      reportedPlayers.includes(memberName) && styles.reportPlayerButtonReported
+                    ]}
+                    onPress={() => handleReportPlayer(memberName)}
+                    activeOpacity={0.8}>
+                    <View style={styles.reportPlayerAvatar}>
+                      <Text style={styles.reportPlayerAvatarText}>
+                        {memberName.charAt(0).toUpperCase()}
+                      </Text>
+                    </View>
+                    <Text style={styles.reportPlayerName}>{memberName}</Text>
+                    {reportedPlayers.includes(memberName) && (
+                      <Text style={styles.reportedBadge}>✓ Signalé</Text>
+                    )}
+                  </TouchableOpacity>
+                ))
+              ) : (
+                ['Julie', 'Marc', 'Sarah'].map((memberName, i) => (
+                  <TouchableOpacity
+                    key={i}
+                    style={[
+                      styles.reportPlayerButton,
+                      reportedPlayers.includes(memberName) && styles.reportPlayerButtonReported
+                    ]}
+                    onPress={() => handleReportPlayer(memberName)}
+                    activeOpacity={0.8}>
+                    <View style={styles.reportPlayerAvatar}>
+                      <Text style={styles.reportPlayerAvatarText}>
+                        {memberName.charAt(0).toUpperCase()}
+                      </Text>
+                    </View>
+                    <Text style={styles.reportPlayerName}>{memberName}</Text>
+                    {reportedPlayers.includes(memberName) && (
+                      <Text style={styles.reportedBadge}>✓ Signalé</Text>
+                    )}
+                  </TouchableOpacity>
+                ))
+              )}
+            </View>
+
+            <TouchableOpacity
+              style={styles.modalButtonCancel}
+              onPress={() => setShowReportModal(false)}>
+              <Text style={styles.modalButtonCancelText}>Fermer</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       {/* Exit Modal */}
       <Modal
         visible={showExitModal}
@@ -587,6 +672,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#374151',
+  },
+  headerActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  reportButton: {
+    width: 40,
+    height: 40,
+    backgroundColor: '#FEE2E2',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  reportIcon: {
+    fontSize: 20,
   },
   exitButton: {
     width: 40,
@@ -1096,6 +1196,48 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  reportPlayersList: {
+    width: '100%',
+    marginBottom: 20,
+  },
+  reportPlayerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f2eded',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+  },
+  reportPlayerButtonReported: {
+    backgroundColor: '#fee2e2',
+    borderWidth: 2,
+    borderColor: '#ef4444',
+  },
+  reportPlayerAvatar: {
+    width: 40,
+    height: 40,
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  reportPlayerAvatarText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#c12ec4',
+  },
+  reportPlayerName: {
+    flex: 1,
+    fontSize: 16,
+    color: '#374151',
+    fontWeight: '500',
+  },
+  reportedBadge: {
+    fontSize: 14,
+    color: '#ef4444',
+    fontWeight: 'bold',
   },
 });
 
